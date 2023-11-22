@@ -14,7 +14,7 @@ class BaseModel:
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     def __init__(self, *args, **kwargs):
-        """Instatntiates a new model"""
+        """Instantiates a new model"""
         if not kwargs:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
@@ -25,10 +25,9 @@ class BaseModel:
                                                      '%Y-%m-%dT%H:%M:%S.%f')
             kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
                                                      '%Y-%m-%dT%H:%M:%S.%f')
-            for k,v in kwargs:
+            for k, v in kwargs.items():
                 if k == 'name':
-                    self.name = v
-                    self.__dict__.update(kwargs)
+                    setattr(self, k, v)
             del kwargs['__class__']
             self.__dict__.update(kwargs)
     def __str__(self):
