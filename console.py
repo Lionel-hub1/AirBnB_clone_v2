@@ -19,9 +19,8 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
 
     classes = {
-               'BaseModel': BaseModel, 'User': User, 'Place': Place,
-               'State': State, 'City': City, 'Amenity': Amenity,
-               'Review': Review
+               'BaseModel', 'User', 'Place',
+               'State', 'City', 'Amenity', 'Review'
               }
     dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
     types = {
@@ -73,7 +72,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] == '{' and pline[-1] =='}'\
+                    if pline[0] == '{' and pline[-1] == '}' \
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -113,16 +112,21 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
+    def do_create(self, c_name):
         """ Create an object of any class"""
-        if not args:
+        if not c_name:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+        all_args = c_name.split()
+        if all_args[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
+        to_do = all_args[1].split("=")
+        value = (to_do[1])[1:-1]
+        for part in HBNBCommand.classes:
+            if (all_args[0] == part):
+                new_instance = HBNBCommand.classes((value))
+                storage.save()
         print(new_instance.id)
         storage.save()
 
