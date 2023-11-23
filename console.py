@@ -113,9 +113,9 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     # def do_create(self, c_name):
-    def do_create(self, arg):
+    def do_create(self, c_name):
         """Create a new instance of a class with given parameters."""
-        args = arg.split()
+        args = c_name.split()
         if len(args) < 1:
             print("** class name missing **")
             return
