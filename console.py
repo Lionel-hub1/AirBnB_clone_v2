@@ -113,20 +113,20 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     # def do_create(self, c_name):
-    def do_create(self, c_name):
+    def do_create(self, arg):
         """Create an object with given parameters."""
-        c_name = arg.split()
-        if len(c_name) < 1:
+        args = arg.split()
+        if len(args) < 1:
             print("** class name missing **")
             return
 
-        class_name = c_name[0]
+        class_name = args[0]
         if class_name not in self.classes:
             print("** class doesn't exist **")
             return
 
         parameters = {}
-        for param in c_name[1:]:
+        for param in args[1:]:
             key_value = param.split('=')
             if len(key_value) != 2:
                 continue
