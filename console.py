@@ -121,27 +121,41 @@ class HBNBCommand(cmd.Cmd):
             return
 
         class_name = args[0]
-        if class_name not in self.classes:
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
 
         # Remove the class name from the arguments
-        params = args[1:]
+        args = args[1:]
 
-        # Parse the parameters and create a dictionary of key-value pairs
-        obj_params = {}
-        for param in params:
-            if "=" in param:
-                key, value = param.split("=")
-                obj_params[key] = value
+        # Create a dictionary to store the parameters
+        params = {}
 
-        # Create an instance of the specified class with the given parameters
-        try:
-            obj = eval(class_name)(**obj_params)
-            obj.save()
-            print(obj.id)
-        except Exception as e:
-            print("** error creating instance: {} **".format(str(e)))
+        # Parse the arguments and extract the parameters
+        for arg in args:
+            if '=' in arg:
+                key, value = arg.split('=')
+                # Remove double quotes from string values
+                if value.startswith('"') and value.endswith('"'):
+                    value = value[1:-1].replace('_', ' ')
+                # Convert float values
+                elif '.' in value:
+                    try:
+                        value = float(value)
+                    except ValueError:
+                        continue
+                # Convert integer values
+                else:
+                    try:
+                        value = int(value)
+                    except ValueError:
+                        continue
+                params[key] = value
+
+        # Create an instance of the class with the given parameters
+        obj = eval(class_name)(**params)
+        obj.save()
+        print(obj.id)
         
 
     def help_create(self):
