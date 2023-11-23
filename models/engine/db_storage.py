@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 from os import environ
 from sqlalchemy import (create_engine)
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
 
 
 class DBStorage:
@@ -9,11 +11,11 @@ class DBStorage:
 
     def __init__(self):
         self.__engine = create_engine(
-                '{}://{}:{}@{}'.format(
-                    environ.get(HBNB_MYSQL_DB),
-                    environ.get(HBNB_MYSQL_USER),
-                    environ.get(HBNB_MYSQL_PWD),
-                    environ.get(HBNB_MYSQL_HOST)
+                'mysql://{}:{}@{}/{}'.format(
+                    environ.get('HBNB_MYSQL_USER'),
+                    environ.get('HBNB_MYSQL_PWD'),
+                    environ.get('HBNB_MYSQL_HOST'),
+                    environ.get('HBNB_MYSQL_DB')
                     ),
                 pool_pre_ping=True)
         if environ.get('HBNB_ENV') == 'test':
@@ -24,23 +26,19 @@ class DBStorage:
         ))
         self.__session = Session()
 
-        def all(self, cls=None):
+    def all(self, cls=None):
             """Query objects from the current database session."""
-        from models import classes  # Import all classes before creating tables
-        result = {}
-
-        if cls:
-            objects = self.__session.query(cls).all()
-        else:
-            objects = []
+            result = {}
+            if cls:
+                objects = self.__session.query(cls).all()
+            else:
+                objects = []
             for class_name in classes:
                 objects.extend(self.__session.query(classes[class_name]).all())
-
-        for obj in objects:
-            key = "{}.{}".format(obj.__class__.__name__, obj.id)
-            result[key] = obj
-
-        return result
+                for obj in objects:
+                    key = "{}.{}".format(obj.__class__.__name__, obj.id)
+                    result[key] = obj
+                return result
 
     def new(self, obj):
         """Add the object to the current database session."""
