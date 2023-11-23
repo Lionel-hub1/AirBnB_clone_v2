@@ -115,45 +115,15 @@ class HBNBCommand(cmd.Cmd):
     # def do_create(self, c_name):
     def do_create(self, c_name):
         """Create an object with given parameters."""
-        # guard against trailing args
-        if c_name and ' ' in c_name:
-            c_name = c_name.partition(' ')[0]
-
-        if not c_name:
+        if not args:
             print("** class name missing **")
             return
-
-        if c_name not in HBNBCommand.classes:
+        elif args not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-
-        # isolate args
-        args = c_name.partition(' ')[2]
-        args = args.split(' ')
-
-        # create dictionary of kwargs
-        kwargs = {}
-        for arg in args:
-            # isolate key and value
-            arg = arg.partition('=')
-            key = arg[0]
-            val = arg[2]
-
-            # check for quoted val arg
-            if val and val[0] == '\"':
-                val = val[1:val.find('\"', 1)]
-
-            # type cast as necessary
-            if key in HBNBCommand.types:
-                val = HBNBCommand.types[key](val)
-
-            # update dictionary with name, value pair
-            kwargs.update({key: val})
-
-        # create new object
-        new = eval(c_name)(**kwargs)
-        new.save()
-        print(new.id)
+        new_instance = HBNBCommand.classes[args]()
+        new_instance.save()
+        print(new_instance.id)
         
 
     def help_create(self):
