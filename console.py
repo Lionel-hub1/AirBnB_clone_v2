@@ -115,68 +115,47 @@ class HBNBCommand(cmd.Cmd):
     # def do_create(self, c_name):
     def do_create(self, c_name):
         """Create an object with given parameters."""
-        ignored_att = ('__class__', 'id', 'created_at', 'updated_at')
-        class_name = ''
-        # Name pattern must match all requirements a-z or with _ or digits
-        name_patt = r'(?P<name>(?:[a-zA-Z]|_)(?:[a-zA-Z]|\d|_)*)'
-        class_match = re.match(name_patt, cmdline)
-        kwargs = {}
-        if class_match is not None:
-            # Calling name pattern matched all requirements
-            class_name = class_match.group('name')
-            # Removing Class name from args in cmdline
-            params_str = cmdline[len(class_name):].strip()
-            # Separating args or parameters by spaces between them
-            params = params_str.split(' ')
-            # All parameters or value must matches all requirements
-            str_patt = r'(?P<t_str>"([^"]|\")*")'
-            float_patt = r'(?P<t_float>[-+]?\d+\.\d+)'
-            int_patt = r'(?P<t_int>[-+]?\d+)'
-            param_patt = '{}=({}|{}|{})'.format(
-                name_patt,
-                str_patt,
-                float_patt,
-                int_patt
-            )
-            for param in params:
-                # All must match key and value patterns
-                param_match = re.fullmatch(param_patt, param)
-                if param_match is not None:
-                    key_name = param_match.group('name')
-                    str_v = param_match.group('t_str')
-                    float_v = param_match.group('t_float')
-                    int_v = param_match.group('t_int')
-                    if float_v is not None:
-                        kwargs[key_name] = float(float_v)
-                    if int_v is not None:
-                        kwargs[key_name] = int(int_v)
-                    if str_v is not None:
-                        kwargs[key_name] = str_v[1:-1].replace('_', ' ')
-        else:
-            class_name = cmdline
-        if not class_name:
+        args = c_name.split()
+        if len(args) < 1:
             print("** class name missing **")
             return
-        elif class_name not in HBNBCommand.classes:
+
+        class_name = args[0]
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        if os.getenv('HBNB_TYPE_STORAGE') == 'db':
-            if not hasattr(kwargs, 'id'):
-                kwargs['id'] = str(uuid.uuid4())
-            if not hasattr(kwargs, 'created_at'):
-                kwargs['created_at'] = str(datetime.now())
-            if not hasattr(kwargs, 'updated_at'):
-                kwargs['updated_at'] = str(datetime.now())
-            new_instance = HBNBCommand.classes[class_name](**kwargs)
-            new_instance.save()
-            print(new_instance.id)
-        else:
-            new_instance = HBNBCommand.classes[class_name]()
-            for key, value in kwargs.items():
-                if key not in ignored_att:
-                    setattr(new_instance, key, value)
-            new_instance.save()
-            print(new_instance.id)
+
+        # Remove the class name from the arguments
+        args = args[1:]
+
+        # Create a dictionary to store the parameters
+        params = {}
+
+        # Parse the arguments and extract the parameters
+        for arg in args:
+            if '=' in arg:
+                key, value = arg.split('=')
+                # Remove double quotes from string values
+                if value.startswith('"') and value.endswith('"'):
+                    value = value[1:-1].replace('_', ' ')
+                # Convert float values
+                elif '.' in value:
+                    try:
+                        value = float(value)
+                    except ValueError:
+                        continue
+                # Convert integer values
+                else:
+                    try:
+                        value = int(value)
+                    except ValueError:
+                        continue
+                params[key] = value
+
+        # Create an instance of the class with the given parameters
+        obj = eval(class_name)(**params)
+        obj.save()
+        print(obj.id)
         
 
     def help_create(self):
