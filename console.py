@@ -115,52 +115,51 @@ class HBNBCommand(cmd.Cmd):
     # def do_create(self, c_name):
     def do_create(self, c_name):
         """Create an object with given parameters."""
-        args = c_name.split()
-        if len(args) < 1:
+        # guard against trailing args
+        if c_name and ' ' in c_name:
+            c_name = c_name.partition(' ')[0]
+
+        if not c_name:
             print("** class name missing **")
             return
 
-        class_name = args[0]
-        if class_name not in HBNBCommand.classes:
+        if c_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
 
-        # Remove the class name from the arguments
-        args = args[1:]
+        # isolate args
+        args = c_name.partition(' ')[2]
+        args = args.split(' ')
 
-        # Create a dictionary to store the parameters
-        params = {}
-
-        # Parse the arguments and extract the parameters
+        # create dictionary of kwargs
+        kwargs = {}
         for arg in args:
-            if '=' in arg:
-                key, value = arg.split('=')
-                # Remove double quotes from string values
-                if value.startswith('"') and value.endswith('"'):
-                    value = value[1:-1].replace('_', ' ')
-                # Convert float values
-                elif '.' in value:
-                    try:
-                        value = float(value)
-                    except ValueError:
-                        continue
-                # Convert integer values
-                else:
-                    try:
-                        value = int(value)
-                    except ValueError:
-                        continue
-                params[key] = value
+            # isolate key and value
+            arg = arg.partition('=')
+            key = arg[0]
+            val = arg[2]
 
-        # Create an instance of the class with the given parameters
-        obj = eval(class_name)(**params)
-        obj.save()
-        print(obj.id)
+            # check for quoted val arg
+            if val and val[0] == '\"':
+                val = val[1:val.find('\"', 1)]
+
+            # type cast as necessary
+            if key in HBNBCommand.types:
+                val = HBNBCommand.types[key](val)
+
+            # update dictionary with name, value pair
+            kwargs.update({key: val})
+
+        # create new object
+        new = eval(c_name)(**kwargs)
+        new.save()
+        print(new.id)
+        
 
     def help_create(self):
         """Help information for the create method."""
         print("Creates a class of any type")
-        print("[Usage]: create <className>\n")
+        print("[Usage]: create <class name> <key>=<value> <key>=<value> ...\n")
 
     def do_show(self, args):
         """Show an individual object."""
