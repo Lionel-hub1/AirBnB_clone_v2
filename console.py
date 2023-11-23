@@ -123,12 +123,15 @@ class HBNBCommand(cmd.Cmd):
             return
         to_do = all_args[1].split("=")
         value = (to_do[1])[1:-1]
+        """
         for part in HBNBCommand.classes:
             if (all_args[0] == part):
                 new_instance = HBNBCommand.classes((value))
                 storage.save()
         print(new_instance.id)
         storage.save()
+        """
+        print(value)
 
     def help_create(self):
         """ Help information for the create method """
