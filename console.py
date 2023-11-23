@@ -112,9 +112,8 @@ class HBNBCommand(cmd.Cmd):
         """Override the emptyline method of CMD."""
         pass
 
-    # def do_create(self, c_name):
     def do_create(self, c_name):
-        """Create a new instance of a class with given parameters."""
+        """ Method to create an object with given parameters """
         args = c_name.split()
         if len(args) < 1:
             print("** class name missing **")
@@ -155,8 +154,7 @@ class HBNBCommand(cmd.Cmd):
         # Create an instance of the class with the given parameters
         obj = eval(class_name)(**params)
         obj.save()
-        print(obj.id)
-        
+        print(obj.id)        
 
     def help_create(self):
         """Help information for the create method."""
